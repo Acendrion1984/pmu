@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PMÜ - Prüfmittelüberwachung</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #f5f5f7;
+      --bg-secondary: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --border-color: #cbd5e1;
+      --card-bg: #ffffff;
+      --header-gradient: linear-gradient(135deg, #003366 0%, #1a4d8c 100%);
+      --shadow-color: rgba(0,51,102,0.2);
+      --input-bg: #ffffff;
+      --badge-category-bg: #dbeafe;
+      --badge-method-bg: #ede9fe;
+      --badge-open-bg: #bbf7d0;
+      --badge-closed-bg: #fecaca;
+      --badge-long-bg: #dbeafe;
+      --badge-short-bg: #fef3c7;
+      --badge-digital-bg: #ede9fe;
+      --badge-opt-bg: #d1fae5;
+      --hover-bg: #f1f5f9;
+      --btn-primary: #003366;
+      --btn-primary-hover: #002244;
+      --btn-success: #059669;
+      --btn-success-hover: #047857;
+      --btn-danger: #dc2626;
+      --btn-danger-hover: #b91c1c;
+      --btn-warning: #d97706;
+      --btn-warning-hover: #b45309;
+      --btn-reopen: #4f46e5;
+      --btn-reopen-hover: #4338ca;
+      --link-color: #2563eb;
+      --text-on-badge: #0f172a;
+      --kw-group-bg: #e2e8f0;
+      --radius: 14px;
+      --shadow-sm: 0 6px 18px rgba(0,0,0,0.08);
+      --shadow-md: 0 12px 26px rgba(0,0,0,0.12);
+      --shadow-lg: 0 20px 42px rgba(0,0,0,0.16);
+      --modal-overlay: rgba(0,0,0,0.5);
+      --shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1e1e1e;
+      --text-primary: #ffffff;
+      --text-secondary: #e0e0e0;
+      --border-color: #4a4a4a;
+      --card-bg: #2a2a2a;
+      --header-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      --shadow-color: rgba(0,0,0,0.5);
+      --input-bg: #2d2d2d;
+      --badge-category-bg: #1e3a8a;
+      --badge-method-bg: #5b21b6;
+      --badge-open-bg: #065f46;
+      --badge-closed-bg: #991b1b;
+      --badge-long-bg: #1e3a8a;
+      --badge-short-bg: #92400e;
+      --badge-digital-bg: #5b21b6;
+      --badge-opt-bg: #065f46;
+      --hover-bg: #374151;
+      --btn-primary: #3b82f6;
+      --btn-primary-hover: #2563eb;
+      --btn-success: #10b981;
+      --btn-success-hover: #059669;
+      --btn-danger: #ef4444;
+      --btn-danger-hover: #dc2626;
+      --btn-warning: #f59e0b;
+      --btn-warning-hover: #d97706;
+      --btn-reopen: #6366f1;
+      --btn-reopen-hover: #4f46e5;
+      --link-color: #60a5fa;
+      --text-on-badge: #ffffff;
+      --kw-group-bg: #2d3748;
+      --modal-overlay: rgba(0,0,0,0.8);
+      --shadow: var(--shadow-sm);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+      position: relative;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 50px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      width: 50px;
+      height: 50px;
+    }
+
+    .theme-toggle:hover { transform: scale(1.1); }
+    .theme-toggle i { font-size: 24px; color: var(--text-primary); }
+
+    .pmu-container { max-width: 1920px; margin: 0 auto; padding: 10px; }
+
+    .pmu-header {
+      background: var(--header-gradient);
+      color: white;
+      padding: 25px 30px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      margin-bottom: 0;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-title h1 {
+      font-size: 28px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .header-title .subtitle { opacity: 0.9; font-size: 14px; color: rgba(255,255,255,0.9); }
+
+    .header-stats {
+      display: flex;
+      gap: 20px;
+      background: rgba(255,255,255,0.1);
+      padding: 15px 25px;
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 28px; font-weight: 700; color: white; }
+    .stat-label { font-size: 12px; opacity: 0.8; color: rgba(255,255,255,0.9); }
+
+    .filter-bar {
+      background: var(--bg-secondary);
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group { flex: 1 1 200px; }
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .filter-group label i { margin-right: 6px; color: var(--btn-primary); }
+
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 10px 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: var(--btn-primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
+    }
+
+    .filter-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+    }
+
+    .btn-primary { background: var(--btn-primary); color: white; border: none; }
+    .btn-primary:hover { background: var(--btn-primary-hover); }
+
+    .btn-success { background: var(--btn-success); color: white; border: none; }
+    .btn-success:hover { background: var(--btn-success-hover); }
+
+    .btn-warning { background: var(--btn-warning); color: white; border: none; }
+    .btn-warning:hover { background: var(--btn-warning-hover); }
+
+    .btn-info { background: var(--btn-primary); color: white; border: none; }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 76px;
+    }
+
+    .kpi-card.warning { border-left: 4px solid #f59e0b; }
+    .kpi-card.danger { border-left: 4px solid #dc2626; }
+    .kpi-card.success { border-left: 4px solid #10b981; }
+
+    .kpi-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--hover-bg);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--btn-primary);
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+
+    .kpi-text { display: flex; flex-direction: column; gap: 2px; }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .kpi-label { color: var(--text-secondary); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+
+    .table-container {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 1800px; }
+
+    th {
+      text-align: left;
+      padding: 15px 10px;
+      background: var(--hover-bg);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 15px 10px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    tr.row-due-soon td { background: var(--badge-short-bg); }
+    tr.row-overdue td { background: var(--badge-closed-bg); }
+    tr:hover td { background: var(--hover-bg); }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+      color: var(--text-on-badge);
+    }
+
+    .status-FERT { background: var(--badge-open-bg); }
+    .status-LAGE { background: var(--badge-open-bg); }
+    .status-UEINT { background: var(--badge-short-bg); }
+    .status-ueINT { background: var(--badge-short-bg); }
+    .status-ÜEXT { background: var(--badge-short-bg); }
+    .status-REPA { background: var(--btn-warning); }
+    .status-DISP { background: var(--badge-method-bg); }
+    .status-NAUF { background: var(--badge-closed-bg); }
+
+    .action-btn {
+      background: none;
+      border: none;
+      color: var(--btn-primary);
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+    .action-btn:hover { background: var(--hover-bg); }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--modal-overlay);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .modal-header h2 { color: var(--text-primary); font-size: 24px; }
+    .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary); }
+
+    .modal-form { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full-width { grid-column: span 3; }
+
+    .form-group label { font-weight: 600; font-size: 13px; color: var(--text-primary); }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: 25px;
+      grid-column: span 3;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--modal-overlay);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      backdrop-filter: blur(5px);
+    }
+
+    .loading-spinner {
+      width: 50px; height: 50px;
+      border: 5px solid var(--bg-secondary);
+      border-top: 5px solid var(--btn-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { background: var(--hover-bg); }
+
+    .year-selector {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .year-nav-btn {
+      background: var(--hover-bg);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--btn-primary);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .year-nav-btn:hover {
+      background: var(--btn-primary);
+      color: white;
+    }
+
+    .year-display {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .yearly-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .yearly-stat-card {
+      background: var(--hover-bg);
+      padding: 15px;
+      border-radius: var(--radius);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .yearly-stat-card.highlight {
+      background: linear-gradient(135deg, var(--hover-bg) 0%, var(--btn-primary) 100%);
+      color: white;
+    }
+
+    .yearly-stat-card .month {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .yearly-stat-card.highlight .month {
+      color: white;
+    }
+
+    .yearly-stat-card .count {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--btn-primary);
+    }
+
+    .yearly-stat-card.highlight .count {
+      color: white;
+    }
+
+    .yearly-stat-card .count-info {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .yearly-stat-card.highlight .count-info {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .yearly-total {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius);
+      text-align: center;
+    }
+
+    .yearly-total .total-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .yearly-total .total-value {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--btn-primary);
+    }
+
+    .yearly-details {
+      display: none !important;
+    }
+
+    .yearly-details {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+    }
+
+    .details-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .details-list {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .details-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .details-item:last-child {
+      border-bottom: none;
+    }
+
+    .details-item .equipment {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .details-item .date {
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+      .yearly-stats-grid { grid-template-columns: repeat(3, 1fr); }
+      table { min-width: 1200px; }
+    }
+    @media (max-width: 768px) {
+      .header-stats { width: 100%; justify-content: space-around; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .yearly-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      table { min-width: 1000px; }
+      .theme-toggle { bottom: 10px; right: 10px; width: 40px; height: 40px; }
+      .theme-toggle i { font-size: 20px; }
+    }
+
+    .print-header { display: none; }
+    @page { size: A4 portrait; margin: 12mm; }
+
+    @media print {
+      body { background: white !important; }
+      .pmu-container { padding: 0 !important; max-width: none !important; }
+      .pmu-header, .filter-bar, .dashboard-grid, .modal, .loading-overlay, .theme-toggle {
+        display: none !important;
+      }
+      .table-container {
+        box-shadow: none !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border-radius: 0 !important;
+      }
+      .print-header { display: block !important; margin-bottom: 8mm; }
+      .print-header .title {
+        font-size: 16pt;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 2mm;
+      }
+      .print-header .meta { font-size: 10pt; color: #333; }
+      table { min-width: 0 !important; width: 100% !important; }
+      th, td {
+        font-size: 8.5pt !important;
+        padding: 6px 6px !important;
+        border-bottom: 1px solid #ddd !important;
+        white-space: normal !important;
+        vertical-align: top;
+      }
+      th {
+        background: #f2f2f2 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+      tr { page-break-inside: avoid; }
+      th:last-child, td:last-child { display: none !important; }
+      .status-badge {
+        border: 1px solid #999 !important;
+        background: transparent !important;
+        color: #000 !important;
+        padding: 2px 6px !important;
+      }
+      tr.row-due-soon td, tr.row-overdue td { background: transparent !important; }
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body data-theme="light">
+  <div class="theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-moon" id="themeIcon"></i>
+  </div>
+
+  <div class="pmu-container">
+    <div class="pmu-header">
+      <div class="header-title">
+        <h1><i class="fas fa-clipboard-list"></i> PMÜ - Prüfmittelüberwachung</h1>
+        <div class="subtitle"><i class="fas fa-calendar-check"></i> Zentrale Übersicht aller Prüfmittel und Fristen</div>
+      </div>
+      <div class="header-stats" id="headerStats">
+        <div class="stat-item">
+          <div class="stat-value" id="totalAnlagen">0</div>
+          <div class="stat-label">Anlagen gesamt</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="aktivAnlagen">0</div>
+          <div class="stat-label">Aktiv (FERT)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="faelligkeitenCount">0</div>
+          <div class="stat-label">Fälligkeiten</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label><i class="fas fa-filter"></i> Anwenderstatus</label>
+        <select id="statusFilter">
+          <option value="">Alle</option>
+          <option value="FERT">FERT</option>
+          <option value="LAGE">LAGE</option>
+          <option value="ÜINT">ÜINT</option>
+          <option value="ÜEXT">ÜEXT</option>
+          <option value="REPA">REPA</option>
+          <option value="DISP">DISP</option>
+          <option value="NAUF">NAUF</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fas fa-search"></i> Suche</label>
+        <input type="text" id="searchFilter" placeholder="Suchen...">
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fas fa-briefcase"></i> Arbeitsplatz</label>
+        <input type="text" id="arbeitsplatzFilter" placeholder="z.B. BAU 22 / MESSRAUM">
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fas fa-building"></i> Kostenstelle</label>
+        <input type="text" id="kostenstelleFilter" placeholder="z.B. 0200-84212">
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fas fa-calendar"></i> Fälligkeit</label>
+        <select id="faelligkeitFilter">
+          <option value="">Alle</option>
+          <option value="overdue">Überfällig</option>
+          <option value="7">In 7 Tagen</option>
+          <option value="30">In 30 Tagen</option>
+          <option value="none">Ohne Datum</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="fas fa-plus"></i> Neu
+        </button>
+        <button class="btn btn-warning" onclick="document.getElementById('csvFileInput').click()">
+          <i class="fas fa-file-csv"></i> CSV Import
+        </button>
+        <button class="btn btn-info" onclick="exportAllData()">
+          <i class="fas fa-download"></i> CSV Export
+        </button>
+        <button class="btn" onclick="loadPruefmittel()">
+          <i class="fas fa-sync-alt"></i> Aktualisieren
+        </button>
+        <button class="btn" onclick="showYearlyStats()">
+          <i class="fas fa-chart-bar"></i> Jahresbelastung
+        </button>
+        <button class="btn" onclick="printA4()">
+          <i class="fas fa-print"></i> Drucken (A4)
+        </button>
+        <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importCSV(this.files[0])">
+      </div>
+    </div>
+
+    <div class="dashboard-grid" id="kpiGrid"></div>
+
+    <div class="print-header" id="printHeader">
+      <div class="title">PMÜ – Prüfmittelübersicht</div>
+      <div class="meta" id="printMeta"></div>
+    </div>
+
+    <div class="table-container">
+      <table id="pruefmittelTable">
+        <thead>
+          <tr>
+            <th>Equipment</th>
+            <th>Bezeichnung</th>
+            <th>Material</th>
+            <th>Hersteller</th>
+            <th>Typbezeichnung</th>
+            <th>Seriennummer</th>
+            <th>Sortierfeld</th>
+            <th>Kostenstelle</th>
+            <th>Verantw. Arbeitsplatz</th>
+            <th>Anwenderstatus</th>
+            <th>Zyklus</th>
+            <th>Kal.-Stichtag</th>
+            <th>Kalibrierdatum</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="14" style="text-align:center;">Daten werden geladen...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal" id="pruefmittelModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Neues Prüfmittel</h2>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+
+      <form id="pruefmittelForm" class="modal-form">
+        <input type="hidden" id="editId">
+
+        <div class="form-group">
+          <label>Equipment *</label>
+          <input type="text" id="equipment" required placeholder="z.B. 12065887">
+        </div>
+
+        <div class="form-group">
+          <label>Bezeichnung *</label>
+          <input type="text" id="bezeichnung" required placeholder="z.B. RISSPRUEFGERAET">
+        </div>
+
+        <div class="form-group">
+          <label>Material</label>
+          <input type="text" id="material" placeholder="z.B. 070935637-0000">
+        </div>
+
+        <div class="form-group">
+          <label>Hersteller</label>
+          <input type="text" id="hersteller" placeholder="z.B. Karl Deutsch">
+        </div>
+
+        <div class="form-group">
+          <label>Typbezeichnung</label>
+          <input type="text" id="typbezeichnung" placeholder="z.B. UWE600">
+        </div>
+
+        <div class="form-group">
+          <label>Seriennummer</label>
+          <input type="text" id="seriennummer" placeholder="z.B. 82032">
+        </div>
+
+        <div class="form-group">
+          <label>Sortierfeld</label>
+          <input type="text" id="sortierfeld" placeholder="z.B. QS GROSSLAGER (BAU 22)">
+        </div>
+
+        <div class="form-group">
+          <label>Kostenstelle</label>
+          <input type="text" id="kostenstelle" placeholder="z.B. 0200-84212">
+        </div>
+
+        <div class="form-group">
+          <label>Verantw. Arbeitsplatz</label>
+          <input type="text" id="arbeitsplatz" placeholder="z.B. BAU 22 / MESSRAUM">
+        </div>
+
+        <div class="form-group">
+          <label>Anwenderstatus</label>
+          <select id="anwenderstatus">
+            <option value="FERT">FERT</option>
+            <option value="LAGE">LAGE</option>
+            <option value="ÜINT">ÜINT</option>
+            <option value="ÜEXT">ÜEXT</option>
+            <option value="REPA">REPA</option>
+            <option value="DISP">DISP</option>
+            <option value="NAUF">NAUF</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Zyklus</label>
+          <input type="text" id="zyklus" placeholder="z.B. 365 Tage, 180 Tage, 90 Tage">
+        </div>
+
+        <div class="form-group">
+          <label>Kal.-Stichtag</label>
+          <input type="text" id="kalibrierstichtag" placeholder="TT.MM.JJJJ">
+        </div>
+
+        <div class="form-group">
+          <label>Kalibrierdatum</label>
+          <input type="text" id="kalibrierdatum" placeholder="TT.MM.JJJJ">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="closeModal()">Abbrechen</button>
+          <button type="submit" class="btn btn-success">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="yearlyStatsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-calendar-alt"></i> Jahresbelastung</h2>
+        <button class="close-modal" onclick="closeYearlyStatsModal()">&times;</button>
+      </div>
+
+      <div class="year-selector">
+        <button class="year-nav-btn" onclick="changeYear(-1)"><i class="fas fa-chevron-left"></i></button>
+        <span class="year-display" id="yearlyYear">2026</span>
+        <button class="year-nav-btn" onclick="changeYear(1)"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <div id="yearlyStatsContent">
+        <div class="yearly-stats-grid" id="yearlyStatsGrid"></div>
+        <div class="yearly-total" id="yearlyTotal"></div>
+        <div class="yearly-details" id="yearlyDetails"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" onclick="closeYearlyStatsModal()">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <script>
+    // Theme Management
+    window.toggleTheme = function() {
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      if (body.getAttribute('data-theme') === 'light') {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.className = 'fas fa-sun';
+        localStorage.setItem('zfp-theme-preference', 'dark');
+      } else {
+        body.setAttribute('data-theme', 'light');
+        themeIcon.className = 'fas fa-moon';
+        localStorage.setItem('zfp-theme-preference', 'light');
+      }
+    };
+
+    const savedTheme = localStorage.getItem('zfp-theme-preference');
+    if (savedTheme) {
+      document.body.setAttribute('data-theme', savedTheme);
+      document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'zfp-theme-preference') {
+        const newTheme = e.newValue;
+        if (newTheme) {
+          document.body.setAttribute('data-theme', newTheme);
+          document.getElementById('themeIcon').className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+      }
+    });
+
+    /* === SUPABASE KONFIGURATION === */
+    const SUPABASE_URL = 'https://wqrynlgbspkjzxuxauvq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_jkkaIcAKxMhkXSdnJY1Oiw_U-xPWr68';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentPruefmittel = [];
+    let currentView = [];
+    let sortState = { key: null, dir: 'asc' };
+    let currentYearlyStatsYear = new Date().getFullYear();
+
+    // DYNAMISCHE DATUMSBERECHNUNG - IMMER AKTUELL!
+    const TODAY = new Date(); // Heutiges Datum (z.B. 27.02.2026)
+    const THIS_YEAR = TODAY.getFullYear();
+    const NEXT_YEAR = THIS_YEAR + 1;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPruefmittel();
+      setupEventListeners();
+      setupTableSorting();
+    });
+
+    function setupEventListeners() {
+      document.getElementById('statusFilter').addEventListener('change', filterData);
+      document.getElementById('searchFilter').addEventListener('input', filterData);
+      document.getElementById('arbeitsplatzFilter').addEventListener('input', filterData);
+      document.getElementById('kostenstelleFilter').addEventListener('input', filterData);
+      document.getElementById('faelligkeitFilter').addEventListener('change', filterData);
+    }
+
+    function parseGermanDate(str) {
+      if (!str || typeof str !== 'string') return null;
+      const parts = str.split('.');
+      if (parts.length !== 3) return null;
+      const [dd, mm, yyyy] = parts.map(p => parseInt(p, 10));
+      if (!dd || !mm || !yyyy) return null;
+      return new Date(yyyy, mm - 1, dd);
+    }
+
+    function parseCycleToDays(cycleStr) {
+      if (!cycleStr) return 365;
+      const str = String(cycleStr).toLowerCase();
+      const match = str.match(/\d+/);
+      if (!match) return 365;
+      return parseInt(match[0], 10);
+    }
+
+    function normalizeStatus(s) {
+      if (!s) return 'FERT';
+      const up = String(s).trim().toUpperCase();
+      if (up === 'UEINT' || up === 'ÜINT') return 'ÜINT';
+      return up;
+    }
+
+    function normalizeUmlautsInWord(word) {
+      if (!word) return word;
+      return word
+        .replace(/AE/g, 'Ä').replace(/OE/g, 'Ö').replace(/UE/g, 'Ü')
+        .replace(/Ae/g, 'Ä').replace(/Oe/g, 'Ö').replace(/Ue/g, 'Ü')
+        .replace(/ae/g, 'ä').replace(/oe/g, 'ö').replace(/ue/g, 'ü');
+    }
+
+    function normalizeUmlautsPreserveWordCase(text) {
+      if (text === null || text === undefined) return text;
+      const s = String(text);
+      return s.split(/(\s+)/).map(token => {
+        if (/^\s+$/.test(token)) return token;
+        return normalizeUmlautsInWord(token);
+      }).join('');
+    }
+
+    async function loadPruefmittel() {
+      showLoading();
+      try {
+        const { data, error } = await supabaseClient
+          .from('pruefmittel')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        currentPruefmittel = (data || []).map(p => ({
+          ...p,
+          equipment: normalizeUmlautsPreserveWordCase(p.equipment),
+          bezeichnung: normalizeUmlautsPreserveWordCase(p.bezeichnung),
+          material: normalizeUmlautsPreserveWordCase(p.material),
+          seriennummer: normalizeUmlautsPreserveWordCase(p.seriennummer),
+          sortierfeld: normalizeUmlautsPreserveWordCase(p.sortierfeld),
+          kostenstelle: normalizeUmlautsPreserveWordCase(p.kostenstelle),
+          arbeitsplatz: normalizeUmlautsPreserveWordCase(p.arbeitsplatz),
+          hersteller: normalizeUmlautsPreserveWordCase(p.hersteller),
+          typbezeichnung: normalizeUmlautsPreserveWordCase(p.typbezeichnung),
+          zyklus: normalizeUmlautsPreserveWordCase(p.zyklus),
+          kalibrierstichtag: normalizeUmlautsPreserveWordCase(p.kalibrierstichtag),
+          kalibrierdatum: normalizeUmlautsPreserveWordCase(p.kalibrierdatum),
+          anwenderstatus: normalizeStatus(p.anwenderstatus)
+        }));
+
+        updateDashboard();
+        filterData();
+      } catch (error) {
+        document.getElementById('tableBody').innerHTML =
+          `<tr><td colspan="14" style="text-align:center;color:var(--btn-danger);">
+            Fehler beim Laden: ${error.message}
+          </td></tr>`;
+      } finally {
+        hideLoading();
+      }
+    }
+
+function calculateYearlyLoad(year) {
+  const monthlyLoad = Array(12).fill(0);
+  const monthlyDetails = Array(12).fill().map(() => []);
+
+  // NUR Geräte mit Kalibrierstichtag berücksichtigen!
+  const relevantePruefmittel = currentPruefmittel.filter(item => 
+    item.kalibrierstichtag && item.kalibrierstichtag.trim() !== ''
+  );
+
+  console.log(`Geräte mit Stichtag: ${relevantePruefmittel.length} von ${currentPruefmittel.length}`);
+
+  if (year === THIS_YEAR) {
+    // AKTUELLES JAHR: Stichtage im aktuellen Jahr
+    relevantePruefmittel.forEach(item => {
+      // Stichtag (geplante Prüfungen)
+      const dueDate = parseGermanDate(item.kalibrierstichtag);
+      if (dueDate && dueDate.getFullYear() === THIS_YEAR) {
+        const month = dueDate.getMonth();
+        monthlyLoad[month]++;
+        monthlyDetails[month].push({
+          equipment: item.equipment || '-',
+          bezeichnung: item.bezeichnung || '-',
+          date: item.kalibrierstichtag,
+          type: 'Stichtag'
+        });
+      }
+      
+      // Kalibrierdatum (erledigte Prüfungen) - nur wenn vorhanden
+      const calDate = parseGermanDate(item.kalibrierdatum);
+      if (calDate && calDate.getFullYear() === THIS_YEAR) {
+        // Vermeide Doppelzählung wenn Stichtag und Kalibrierdatum im gleichen Monat sind
+        const isDuplicate = monthlyDetails[calDate.getMonth()].some(
+          d => d.equipment === (item.equipment || '-') && d.type === 'Stichtag'
+        );
+        
+        if (!isDuplicate) {
+          const month = calDate.getMonth();
+          monthlyLoad[month]++;
+          monthlyDetails[month].push({
+            equipment: item.equipment || '-',
+            bezeichnung: item.bezeichnung || '-',
+            date: item.kalibrierdatum,
+            type: 'erledigt'
+          });
+        }
+      }
+    });
+  } 
+  else if (year > THIS_YEAR) {
+    // ZUKÜNFTIGE JAHRE: Basierend auf Stichtag + Zyklus
+    relevantePruefmittel.forEach(item => {
+      const dueDate = parseGermanDate(item.kalibrierstichtag);
+      const cycleDays = parseCycleToDays(item.zyklus);
+      
+      if (dueDate) {
+        // Vom Stichtag aus den nächsten Zyklus berechnen
+        let nextDate = new Date(dueDate);
+        
+        // So viele Zyklen addieren, bis wir im gewünschten Jahr sind
+        while (nextDate.getFullYear() < year) {
+          nextDate = new Date(nextDate.getTime() + cycleDays * 24 * 60 * 60 * 1000);
+        }
+        
+        // Prüfen ob wir genau in diesem Jahr gelandet sind
+        if (nextDate.getFullYear() === year) {
+          const month = nextDate.getMonth();
+          monthlyLoad[month]++;
+          monthlyDetails[month].push({
+            equipment: item.equipment || '-',
+            bezeichnung: item.bezeichnung || '-',
+            date: nextDate.toLocaleDateString('de-DE'),
+            type: `Zyklus (alle ${cycleDays} Tage)`
+          });
+        }
+      }
+    });
+  }
+
+  // Details nach Datum sortieren
+  monthlyDetails.forEach(monthArray => {
+    monthArray.sort((a, b) => {
+      const dateA = parseGermanDate(a.date);
+      const dateB = parseGermanDate(b.date);
+      return dateA - dateB;
+    });
+  });
+
+  // Debug-Ausgabe
+  console.log(`Jahr ${year} - Gesamt: ${monthlyLoad.reduce((a, b) => a + b, 0)}`);
+  console.log('Monatliche Verteilung:', monthlyLoad);
+
+  return { monthlyLoad, monthlyDetails };
+}
+
+    function showYearlyStats() {
+      updateYearlyStats(currentYearlyStatsYear);
+      document.getElementById('yearlyStatsModal').style.display = 'flex';
+    }
+
+    function changeYear(delta) {
+  currentYearlyStatsYear += delta;
+  if (currentYearlyStatsYear < THIS_YEAR) currentYearlyStatsYear = THIS_YEAR;
+  if (currentYearlyStatsYear > THIS_YEAR + 5) currentYearlyStatsYear = THIS_YEAR + 5; // Bis zu 5 Jahre in die Zukunft
+  updateYearlyStats(currentYearlyStatsYear);
+}
+
+    function updateYearlyStats(year) {
+      document.getElementById('yearlyYear').textContent = year;
+      const { monthlyLoad, monthlyDetails } = calculateYearlyLoad(year);
+      const totalForYear = monthlyLoad.reduce((a, b) => a + b, 0);
+
+      const monthNames = [
+        'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+      ];
+
+      const currentMonth = TODAY.getMonth();
+      const currentYear = TODAY.getFullYear();
+
+      const grid = document.getElementById('yearlyStatsGrid');
+      grid.innerHTML = monthlyLoad.map((count, index) => {
+        const isCurrent = (year === currentYear && index === currentMonth);
+        const details = monthlyDetails[index];
+        const erledigt = details.filter(d => d.type === 'erledigt').length;
+        const geplant = details.filter(d => d.type === 'geplant' || d.type === 'stichtag' || d.type === 'zyklus').length;
+        
+        let infoText = [];
+        if (erledigt > 0) infoText.push(`${erledigt} erledigt`);
+        if (geplant > 0) infoText.push(`${geplant} geplant`);
+        
+        return `
+          <div class="yearly-stat-card ${isCurrent ? 'highlight' : ''}">
+            <div class="month">${monthNames[index]}</div>
+            <div class="count">${count}</div>
+            ${infoText.length > 0 ? `<div class="count-info">${infoText.join(' • ')}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('yearlyTotal').innerHTML = `
+        <div class="total-label">Kalibrierungen im Jahr ${year}</div>
+        <div class="total-value">${totalForYear}</div>
+        <div style="margin-top: 10px; color: var(--text-secondary); font-size: 14px;">
+          ${monthlyLoad.reduce((a, b) => a + b, 0)} Gesamt 
+          (${monthlyDetails.flat().filter(d => d.type === 'erledigt').length} erledigt, 
+           ${monthlyDetails.flat().filter(d => d.type !== 'erledigt').length} geplant)
+        </div>
+      `;
+
+      // Details-Bereich immer leeren
+      document.getElementById('yearlyDetails').innerHTML = '';
+    }
+
+    function filterData() {
+      const status = document.getElementById('statusFilter').value;
+      const search = document.getElementById('searchFilter').value.toLowerCase().trim();
+      const arbeitsplatzSearch = (document.getElementById('arbeitsplatzFilter').value || '').toLowerCase().trim();
+      const kostenstelleSearch = (document.getElementById('kostenstelleFilter').value || '').toLowerCase().trim();
+      const faelligkeit = document.getElementById('faelligkeitFilter').value;
+
+      const heute = TODAY;
+      const in7Tagen = new Date(heute); in7Tagen.setDate(heute.getDate() + 7);
+      const in30Tagen = new Date(heute); in30Tagen.setDate(heute.getDate() + 30);
+
+      let filtered = [...currentPruefmittel];
+
+      if (status) filtered = filtered.filter(item => normalizeStatus(item.anwenderstatus) === status);
+
+      if (search) {
+        filtered = filtered.filter(item =>
+          (item.equipment && item.equipment.toLowerCase().includes(search)) ||
+          (item.bezeichnung && item.bezeichnung.toLowerCase().includes(search)) ||
+          (item.material && item.material.toLowerCase().includes(search)) ||
+          (item.seriennummer && item.seriennummer.toLowerCase().includes(search)) ||
+          (item.sortierfeld && item.sortierfeld.toLowerCase().includes(search)) ||
+          (item.kostenstelle && item.kostenstelle.toLowerCase().includes(search)) ||
+          (item.arbeitsplatz && item.arbeitsplatz.toLowerCase().includes(search)) ||
+          (item.hersteller && item.hersteller.toLowerCase().includes(search)) ||
+          (item.typbezeichnung && item.typbezeichnung.toLowerCase().includes(search))
+        );
+      }
+
+      if (arbeitsplatzSearch) filtered = filtered.filter(item => (item.arbeitsplatz || '').toLowerCase().includes(arbeitsplatzSearch));
+      if (kostenstelleSearch) filtered = filtered.filter(item => (item.kostenstelle || '').toLowerCase().includes(kostenstelleSearch));
+
+      if (faelligkeit) {
+        filtered = filtered.filter(item => {
+          const d = parseGermanDate(item.kalibrierstichtag);
+          if (faelligkeit === 'none') return !d;
+          if (!d) return false;
+          if (faelligkeit === 'overdue') return d < heute;
+          if (faelligkeit === '7') return d <= in7Tagen;
+          if (faelligkeit === '30') return d <= in30Tagen;
+          return true;
+        });
+      }
+
+      filtered = sortData(filtered);
+      currentView = filtered;
+      renderTable(currentView);
+      paintSortIndicators();
+    }
+
+    function sortData(data) {
+      if (!sortState.key) return data;
+      const key = sortState.key;
+      const dir = sortState.dir;
+
+      return [...data].sort((x, y) => {
+        if (key === 'kalibrierstichtag' || key === 'kalibrierdatum') {
+          const dx = parseGermanDate(x[key]);
+          const dy = parseGermanDate(y[key]);
+          const mul = dir === 'asc' ? 1 : -1;
+          if (!dx && !dy) return 0;
+          if (!dx) return 1;
+          if (!dy) return -1;
+          return (dx - dy) * mul;
+        }
+        return compareValues(x[key], y[key], dir);
+      });
+    }
+
+    function compareValues(a, b, dir = 'asc') {
+      const mul = dir === 'asc' ? 1 : -1;
+      const aEmpty = (a === null || a === undefined || a === '');
+      const bEmpty = (b === null || b === undefined || b === '');
+      if (aEmpty && bEmpty) return 0;
+      if (aEmpty) return 1;
+      if (bEmpty) return -1;
+      const aNum = Number(a);
+      const bNum = Number(b);
+      const aIsNum = !isNaN(aNum) && String(a).trim() !== '';
+      const bIsNum = !isNaN(bNum) && String(b).trim() !== '';
+      if (aIsNum && bIsNum) return (aNum - bNum) * mul;
+      return String(a).localeCompare(String(b), 'de', { sensitivity: 'base' }) * mul;
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;">Keine Prüfmittel gefunden</td></tr>';
+        return;
+      }
+
+      let html = '';
+      data.forEach(item => {
+        const statusNormalized = normalizeStatus(item.anwenderstatus);
+        html += `<tr>`;
+        html += `<td><strong>${item.equipment || '-'}</strong></td>`;
+        html += `<td>${item.bezeichnung || '-'}</td>`;
+        html += `<td>${item.material || '-'}</td>`;
+        html += `<td>${item.hersteller || '-'}</td>`;
+        html += `<td>${item.typbezeichnung || '-'}</td>`;
+        html += `<td>${item.seriennummer || '-'}</td>`;
+        html += `<td>${item.sortierfeld || '-'}</td>`;
+        html += `<td>${item.kostenstelle || '-'}</td>`;
+        html += `<td>${item.arbeitsplatz || '-'}</td>`;
+        html += `<td><span class="status-badge status-${statusNormalized}">${statusNormalized}</span></td>`;
+        html += `<td>${item.zyklus || '-'}</td>`;
+        html += `<td>${item.kalibrierstichtag || '-'}</td>`;
+        html += `<td>${item.kalibrierdatum || '-'}</td>`;
+        html += `<td>`;
+        html += `<button class="action-btn" onclick="editPruefmittel('${item.id}')"><i class="fas fa-edit"></i></button>`;
+        html += `<button class="action-btn" onclick="deletePruefmittel('${item.id}')"><i class="fas fa-trash"></i></button>`;
+        html += `</td>`;
+        html += `</tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function updateDashboard() {
+      const total = currentPruefmittel.length;
+      const aktiv = currentPruefmittel.filter(p => normalizeStatus(p.anwenderstatus) === 'FERT').length;
+      
+      const heute = TODAY;
+      const in30Tagen = new Date(heute); in30Tagen.setDate(heute.getDate() + 30);
+      const faelligkeiten = currentPruefmittel.filter(p => {
+        const d = parseGermanDate(p.kalibrierstichtag);
+        return d ? d <= in30Tagen : false;
+      }).length;
+
+      document.getElementById('totalAnlagen').textContent = total;
+      document.getElementById('aktivAnlagen').textContent = aktiv;
+      document.getElementById('faelligkeitenCount').textContent = faelligkeiten;
+      
+      renderKpiCards();
+    }
+
+    function renderKpiCards() {
+      const heute = TODAY;
+      const in30Tagen = new Date(heute); in30Tagen.setDate(heute.getDate() + 30);
+      const in7Tagen = new Date(heute); in7Tagen.setDate(heute.getDate() + 7);
+
+      const in30 = currentPruefmittel.filter(p => {
+        const d = parseGermanDate(p.kalibrierstichtag);
+        return d ? d <= in30Tagen : false;
+      }).length;
+
+      const in7 = currentPruefmittel.filter(p => {
+        const d = parseGermanDate(p.kalibrierstichtag);
+        return d ? d <= in7Tagen : false;
+      }).length;
+
+      const overdue = currentPruefmittel.filter(p => {
+        const d = parseGermanDate(p.kalibrierstichtag);
+        return d ? d < heute : false;
+      }).length;
+
+      const total = currentPruefmittel.length;
+
+      document.getElementById('kpiGrid').innerHTML = `
+        <div class="kpi-card ${overdue > 0 ? 'danger' : ''}">
+          <div class="kpi-icon"><i class="fas fa-exclamation-circle"></i></div>
+          <div class="kpi-text">
+            <div class="kpi-value">${overdue}</div>
+            <div class="kpi-label">Überfällig</div>
+          </div>
+        </div>
+        <div class="kpi-card ${in7 > 0 ? 'warning' : ''}">
+          <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+          <div class="kpi-text">
+            <div class="kpi-value">${in7}</div>
+            <div class="kpi-label">In 7 Tagen</div>
+          </div>
+        </div>
+        <div class="kpi-card ${in30 > 0 ? 'warning' : ''}">
+          <div class="kpi-icon"><i class="fas fa-calendar-alt"></i></div>
+          <div class="kpi-text">
+            <div class="kpi-value">${in30}</div>
+            <div class="kpi-label">In 30 Tagen</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="kpi-text">
+            <div class="kpi-value">${total}</div>
+            <div class="kpi-label">Gesamt</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setupTableSorting() {
+      const table = document.getElementById('pruefmittelTable');
+      const ths = table.querySelectorAll('thead th');
+
+      const colMap = {
+        0: 'equipment',
+        1: 'bezeichnung',
+        2: 'material',
+        3: 'hersteller',
+        4: 'typbezeichnung',
+        5: 'seriennummer',
+        6: 'sortierfeld',
+        7: 'kostenstelle',
+        8: 'arbeitsplatz',
+        9: 'anwenderstatus',
+        10: 'zyklus',
+        11: 'kalibrierstichtag',
+        12: 'kalibrierdatum'
+      };
+
+      ths.forEach(th => th.setAttribute('data-base-text', th.textContent.trim()));
+
+      ths.forEach((th, idx) => {
+        if (!(idx in colMap)) return;
+        th.classList.add('sortable');
+        th.addEventListener('click', () => {
+          const key = colMap[idx];
+          if (sortState.key === key) sortState.dir = (sortState.dir === 'asc') ? 'desc' : 'asc';
+          else { sortState.key = key; sortState.dir = 'asc'; }
+          filterData();
+        });
+      });
+
+      paintSortIndicators();
+    }
+
+    function paintSortIndicators() {
+      const table = document.getElementById('pruefmittelTable');
+      const ths = table.querySelectorAll('thead th');
+
+      const colMap = {
+        0: 'equipment',
+        1: 'bezeichnung',
+        2: 'material',
+        3: 'hersteller',
+        4: 'typbezeichnung',
+        5: 'seriennummer',
+        6: 'sortierfeld',
+        7: 'kostenstelle',
+        8: 'arbeitsplatz',
+        9: 'anwenderstatus',
+        10: 'zyklus',
+        11: 'kalibrierstichtag',
+        12: 'kalibrierdatum'
+      };
+
+      ths.forEach((th, idx) => {
+        const base = th.getAttribute('data-base-text') || th.textContent.replace(/[\s▲▼]+$/g, '').trim();
+        th.setAttribute('data-base-text', base);
+        if (!(idx in colMap)) { th.textContent = base; return; }
+        const key = colMap[idx];
+        if (sortState.key === key) th.textContent = `${base} ${sortState.dir === 'asc' ? '▲' : '▼'}`;
+        else th.textContent = base;
+      });
+    }
+
+    function printA4() {
+      const status = document.getElementById('statusFilter')?.value || '';
+      const search = document.getElementById('searchFilter')?.value || '';
+      const ks = document.getElementById('kostenstelleFilter')?.value || '';
+      const fa = document.getElementById('faelligkeitFilter')?.value || '';
+
+      const dt = new Date();
+      const dateStr = dt.toLocaleString('de-DE');
+
+      const parts = [];
+      if (status) parts.push(`Status: ${status}`);
+      if (search) parts.push(`Suche: ${search}`);
+      if (ks) parts.push(`Kostenstelle: ${ks}`);
+      if (fa) parts.push(`Fälligkeit: ${fa}`);
+
+      const meta = `Gedruckt am: ${dateStr}` + (parts.length ? ` | Filter: ${parts.join(' | ')}` : '');
+      document.getElementById('printMeta').textContent = meta;
+
+      window.print();
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Neues Prüfmittel';
+      document.getElementById('pruefmittelForm').reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('pruefmittelModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('pruefmittelModal').style.display = 'none';
+    }
+
+    function closeYearlyStatsModal() {
+      document.getElementById('yearlyStatsModal').style.display = 'none';
+    }
+
+    function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+    function exportAllData() {
+      if (currentPruefmittel.length === 0) {
+        alert('Keine Daten zum Exportieren vorhanden!');
+        return;
+      }
+
+      const headers = [
+        'Equipment', 'Bezeichnung', 'Material', 'Seriennummer', 'Hersteller',
+        'Typbezeichnung', 'Sortierfeld', 'Kostenstelle', 'Arbeitsplatz',
+        'Anwenderstatus', 'Zyklus', 'Kal.-Stichtag', 'Kalibrierdatum'
+      ];
+
+      const csvRows = [];
+      csvRows.push(headers.join(';'));
+
+      currentPruefmittel.forEach(item => {
+        const row = [
+          item.equipment || '',
+          item.bezeichnung || '',
+          item.material || '',
+          item.seriennummer || '',
+          item.hersteller || '',
+          item.typbezeichnung || '',
+          item.sortierfeld || '',
+          item.kostenstelle || '',
+          item.arbeitsplatz || '',
+          item.anwenderstatus || 'FERT',
+          item.zyklus || '',
+          item.kalibrierstichtag || '',
+          item.kalibrierdatum || ''
+        ];
+        csvRows.push(row.join(';'));
+      });
+
+      const csvString = csvRows.join('\n');
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const date = new Date();
+      const dateStr = date.toISOString().split('T')[0];
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `pruefmittel_export_${dateStr}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    async function deletePruefmittel(id) {
+      if (!confirm('Wirklich löschen?')) return;
+      showLoading();
+      try {
+        const { error } = await supabaseClient
+          .from('pruefmittel')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        await loadPruefmittel();
+      } catch (error) {
+        alert('Fehler beim Löschen: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    async function editPruefmittel(id) {
+      const item = currentPruefmittel.find(p => p.id == id);
+      if (!item) return;
+
+      document.getElementById('modalTitle').textContent = 'Prüfmittel bearbeiten';
+      document.getElementById('editId').value = item.id;
+      document.getElementById('equipment').value = item.equipment || '';
+      document.getElementById('bezeichnung').value = item.bezeichnung || '';
+      document.getElementById('material').value = item.material || '';
+      document.getElementById('hersteller').value = item.hersteller || '';
+      document.getElementById('typbezeichnung').value = item.typbezeichnung || '';
+      document.getElementById('seriennummer').value = item.seriennummer || '';
+      document.getElementById('sortierfeld').value = item.sortierfeld || '';
+      document.getElementById('kostenstelle').value = item.kostenstelle || '';
+      document.getElementById('arbeitsplatz').value = item.arbeitsplatz || '';
+      document.getElementById('anwenderstatus').value = normalizeStatus(item.anwenderstatus);
+      document.getElementById('zyklus').value = item.zyklus || '';
+      document.getElementById('kalibrierstichtag').value = item.kalibrierstichtag || '';
+      document.getElementById('kalibrierdatum').value = item.kalibrierdatum || '';
+
+      document.getElementById('pruefmittelModal').style.display = 'flex';
+    }
+
+    document.getElementById('pruefmittelForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      showLoading();
+
+      try {
+        const formData = {
+          equipment: document.getElementById('equipment').value,
+          bezeichnung: document.getElementById('bezeichnung').value,
+          material: document.getElementById('material').value || null,
+          hersteller: document.getElementById('hersteller').value || null,
+          typbezeichnung: document.getElementById('typbezeichnung').value || null,
+          seriennummer: document.getElementById('seriennummer').value || null,
+          sortierfeld: document.getElementById('sortierfeld').value || null,
+          kostenstelle: document.getElementById('kostenstelle').value || null,
+          arbeitsplatz: document.getElementById('arbeitsplatz').value || null,
+          anwenderstatus: normalizeStatus(document.getElementById('anwenderstatus').value),
+          zyklus: document.getElementById('zyklus').value || null,
+          kalibrierstichtag: document.getElementById('kalibrierstichtag').value || null,
+          kalibrierdatum: document.getElementById('kalibrierdatum').value || null
+        };
+
+        const editId = document.getElementById('editId').value;
+        let result;
+
+        if (editId) {
+          result = await supabaseClient
+            .from('pruefmittel')
+            .update(formData)
+            .eq('id', editId);
+        } else {
+          result = await supabaseClient
+            .from('pruefmittel')
+            .insert([formData]);
+        }
+
+        if (result.error) throw result.error;
+
+        closeModal();
+        await loadPruefmittel();
+      } catch (error) {
+        alert('Fehler beim Speichern: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    });
+
+    async function importCSV(file) {
+      if (!file) return;
+      showLoading();
+
+      try {
+        const text = await file.text();
+        const cleanText = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+        const lines = cleanText.split('\n');
+        const headers = lines[0].split(';').map(h => h.trim());
+        const dataRows = lines.slice(1).filter(line => line.trim() !== '');
+
+        const importData = [];
+        const errors = [];
+        let updates = 0;
+        let inserts = 0;
+
+        for (let i = 0; i < dataRows.length; i++) {
+          try {
+            const values = dataRows[i].split(';').map(v => v.trim());
+            if (values.length >= 13) {
+              const item = {
+                equipment: values[0] || null,
+                bezeichnung: values[1] || null,
+                material: values[2] || null,
+                seriennummer: values[3] || null,
+                hersteller: values[4] || null,
+                typbezeichnung: values[5] || null,
+                sortierfeld: values[6] || null,
+                kostenstelle: values[7] || null,
+                arbeitsplatz: values[8] || null,
+                anwenderstatus: values[9] || 'FERT',
+                zyklus: values[10] || null,
+                kalibrierstichtag: values[11] || null,
+                kalibrierdatum: values[12] || null
+              };
+
+              if (!item.equipment || !item.bezeichnung) {
+                errors.push(`Zeile ${i + 2}: Equipment und Bezeichnung sind Pflichtfelder`);
+                continue;
+              }
+
+              if (item.anwenderstatus) {
+                item.anwenderstatus = item.anwenderstatus.toUpperCase();
+              }
+
+              importData.push(item);
+            } else {
+              errors.push(`Zeile ${i + 2}: Ungültige Anzahl an Spalten (erwartet: 13, erhalten: ${values.length})`);
+            }
+          } catch (err) {
+            errors.push(`Zeile ${i + 2}: Fehler beim Parsen - ${err.message}`);
+          }
+        }
+
+        if (importData.length > 0) {
+          for (const item of importData) {
+            try {
+              const { data: existing, error: checkError } = await supabaseClient
+                .from('pruefmittel')
+                .select('id')
+                .eq('equipment', item.equipment)
+                .maybeSingle();
+
+              if (checkError) throw checkError;
+
+              if (existing) {
+                const { error: updateError } = await supabaseClient
+                  .from('pruefmittel')
+                  .update(item)
+                  .eq('id', existing.id);
+                if (!updateError) updates++;
+                else errors.push(`Fehler beim Aktualisieren von ${item.equipment}: ${updateError.message}`);
+              } else {
+                const { error: insertError } = await supabaseClient
+                  .from('pruefmittel')
+                  .insert([item]);
+                if (!insertError) inserts++;
+                else errors.push(`Fehler beim Einfügen von ${item.equipment}: ${insertError.message}`);
+              }
+            } catch (err) {
+              errors.push(`Fehler bei Verarbeitung von ${item.equipment}: ${err.message}`);
+            }
+          }
+
+          let message = `Import abgeschlossen:\n✅ ${inserts} neue Datensätze eingefügt\n🔄 ${updates} vorhandene Datensätze aktualisiert\n`;
+          if (errors.length > 0) {
+            message += `\n❌ Fehler bei ${errors.length} Datensätzen:\n${errors.slice(0, 10).join('\n')}`;
+            if (errors.length > 10) message += `\n... und ${errors.length - 10} weitere Fehler`;
+          }
+          alert(message);
+          await loadPruefmittel();
+        } else {
+          alert('Keine gültigen Daten zum Importieren gefunden.\n' + errors.join('\n'));
+        }
+      } catch (error) {
+        alert('Fehler beim CSV-Import: ' + error.message);
+      } finally {
+        hideLoading();
+        document.getElementById('csvFileInput').value = '';
+      }
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('pruefmittelModal');
+      if (event.target === modal) closeModal();
+      const yearlyModal = document.getElementById('yearlyStatsModal');
+      if (event.target === yearlyModal) closeYearlyStatsModal();
+    };
+
+    window.editPruefmittel = editPruefmittel;
+    window.deletePruefmittel = deletePruefmittel;
+    window.openAddModal = openAddModal;
+    window.closeModal = closeModal;
+    window.exportAllData = exportAllData;
+    window.showYearlyStats = showYearlyStats;
+    window.changeYear = changeYear;
+    window.closeYearlyStatsModal = closeYearlyStatsModal;
+    window.printA4 = printA4;
+    window.importCSV = importCSV;
+    window.loadPruefmittel = loadPruefmittel;
+    window.toggleTheme = toggleTheme;
+  </script>
+</body>
+</html>
