@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": 1774029126482,
+    "horizon": "langfristig",
+    "category": "Digitalisierung",
+    "title": "Einführung MDE",
+    "process": "alle",
+    "inspection_method": "UT",
+    "description": "• Maschinendatenerfassung einführen",
+    "measures": "• Lastenheft",
+    "status": "open",
+    "progress": 50,
+    "created_at": "2026-03-20T17:52:06.482Z"
+  }
+]
